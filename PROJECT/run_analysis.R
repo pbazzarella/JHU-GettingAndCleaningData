@@ -17,7 +17,6 @@ if(!file.exists("data")) {
 }
 
 
-
 # [ STEP 03] - DOWNLOAD FILE -----------------------------
 fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip" 
 #setInternet2(use = TRUE)
@@ -26,7 +25,6 @@ unzip("./data/gcd_project.zip",exdir = "./data" )
 #help(unzip)
 
 # [ STEP 04 ] - DATA LOAD --------------------------------
-
 # TEST DATA
 testX <- read.table("./data/UCI HAR Dataset/test/X_test.txt") 
 testY <- read.table("./data/UCI HAR Dataset/test/y_test.txt") 
@@ -48,7 +46,25 @@ dataMerge <- rbind(testX, trainX)
 labelMerge <- rbind(testY, trainY)
 subjectMerge <- rbind(testSubject, trainSubject)
 
+
+# [ STEP 05 ] - DATA ETL (EXTRACT MEASURES) --------------
 # ADD NAMES TO DATA
 names(dataMerge) <- features$V2
+# Name the variable as 'Activity' and merge to the final data set
+colnames(labelMerge) <- c('Activity')
+dataMerge <- bind_cols(dataMerge, labelMerge)
 
-head(dataMerge)
+# Bind the subjects to the final data set
+colnames(subjectMerge) <- c('Subject')
+dataMerge <- bind_cols(dataMerge, subjectMerge)
+
+# Mean and Standard Deviation for each measurement 
+dataMerge <- select(dataMerge, contains('mean'), contains('std'))
+
+# Create a summary data set grouped by Subject and Activity
+dataGroup <- group_by(dataMerge, Subject, Activity)
+tidydata <- summarise_each(dataGroup, funs(mean))
+
+## Write the Summary Data to a text file
+write.table(tidydata, file = "./data/tidydata.txt", row.names = FALSE)
+
