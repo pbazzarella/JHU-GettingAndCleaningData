@@ -60,3 +60,8 @@ In order to obtain a tidy data set, the following was performed:
 6.1 - Export the tidydata to file (tidydata.txt)
 
 
+##TIDYDATA.txt
+This is the final result of the script.
+
+
+
